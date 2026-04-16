@@ -17,11 +17,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+def auth_enabled():
+    """Returns True only if auth secrets are configured."""
+    try:
+        _ = st.user.is_logged_in
+        return True
+    except Exception:
+        return False
+
 def get_data_file():
     """Return a data file path scoped to the logged-in user."""
-    if st.user.is_logged_in:
-        user_hash = hashlib.md5(st.user.email.encode()).hexdigest()[:12]
-        return os.path.join(os.path.dirname(__file__), f"habit_data_{user_hash}.json")
+    try:
+        if st.user.is_logged_in:
+            user_hash = hashlib.md5(st.user.email.encode()).hexdigest()[:12]
+            return os.path.join(os.path.dirname(__file__), f"habit_data_{user_hash}.json")
+    except Exception:
+        pass
     return os.path.join(os.path.dirname(__file__), "habit_data.json")
 
 DATA_FILE = get_data_file()
@@ -905,18 +916,19 @@ def page_rewards(data):
 def main():
     inject_css()
 
-    # ── Auth gate ──
-    if not st.user.is_logged_in:
-        st.markdown("""
+    # ── Auth gate (only active when secrets are configured) ──
+    if auth_enabled():
+        if not st.user.is_logged_in:
+            st.markdown("""
 <div style="text-align:center;padding:80px 20px;">
     <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
     <p style="font-size:15px;color:#71717A;margin-bottom:32px;">Sign in to access your habits</p>
 </div>
 """, unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([2, 1, 2])
-        with col2:
-            st.login()
-        st.stop()
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col2:
+                st.login()
+            st.stop()
 
     # Per-user data file
     global DATA_FILE
