@@ -17,6 +17,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+def auth_enabled():
+    try:
+        return "auth" in st.secrets
+    except Exception:
+        return False
+
+def get_data_file():
+    if auth_enabled() and st.user.is_logged_in:
+        email_hash = hashlib.md5(st.user.email.encode()).hexdigest()
+        return os.path.join(os.path.dirname(__file__), f"habit_data_{email_hash}.json")
+    return os.path.join(os.path.dirname(__file__), "habit_data.json")
+
 DATA_FILE = os.path.join(os.path.dirname(__file__), "habit_data.json")
 
 # ── CSS ─────────────────────────────────────────────────────────────────────────
@@ -898,6 +910,22 @@ def page_rewards(data):
 def main():
     inject_css()
 
+    if auth_enabled():
+        if not st.user.is_logged_in:
+            st.markdown("""
+<div style="text-align:center;padding:80px 20px;">
+    <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
+    <p style="font-size:15px;color:#71717A;margin-bottom:32px;">Sign in to access your habits</p>
+</div>
+""", unsafe_allow_html=True)
+            col1, col2, col3 = st.columns([2, 1, 2])
+            with col2:
+                st.login()
+            st.stop()
+
+    global DATA_FILE
+    DATA_FILE = get_data_file()
+
     data = load_data()
 
     # App wordmark + balance chip
@@ -905,12 +933,17 @@ def main():
     total_balance, _ = calculate_earnings(data, logs_df)
     balance_chip = f" &nbsp; <span style='background:#F0FDF4;border:1px solid #BBF7D0;color:#15803D;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:600;'>£{total_balance:,.2f}</span>" if total_balance > 0 else ""
 
-    st.markdown(f"""
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        st.markdown(f"""
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
     <span style="font-size:16px;font-weight:700;color:#18181B;letter-spacing:-0.3px;">✦ Habit Tracker</span>
     <span>{balance_chip}</span>
 </div>
 """, unsafe_allow_html=True)
+    with col2:
+        if auth_enabled():
+            st.logout()
 
     has_habits = bool(get_active_habits(data))
 
