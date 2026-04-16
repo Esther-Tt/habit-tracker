@@ -787,9 +787,7 @@ def page_progress(data):
 def page_rewards(data):
     st.markdown("<h1 style='margin-bottom:8px;'>Rewards</h1>", unsafe_allow_html=True)
     st.markdown("""<p style='color:#71717A;font-size:14px;margin-bottom:28px;'>
-        Every habit you complete earns you symbolic money based on the rates you set.
-        Add items to your wishlist, assign what % of your balance goes toward each one,
-        and watch your savings grow as a mental reminder of the extras consistency can buy you.
+        Complete habits to earn symbolic money. Add wishlist items and allocate your balance toward them.
     </p>""", unsafe_allow_html=True)
 
     logs_df = get_logs_df(data)
@@ -915,18 +913,19 @@ def main():
 
     if not st.session_state.get("_user_id"):
         st.markdown("""
-<div style="text-align:center;padding:80px 20px 0;">
-    <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
-    <p style="font-size:15px;color:#71717A;margin-bottom:28px;">Sign in or create an account</p>
+<div style="text-align:center;padding:120px 20px 0;">
+    <p style="font-size:42px;font-weight:700;color:#18181B;letter-spacing:-1px;margin-bottom:10px;">✦ Habit Tracker</p>
+    <p style="font-size:17px;color:#71717A;margin-bottom:48px;">Sign in or create an account</p>
 </div>
 """, unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns([2, 1.2, 2])
+        col1, col2, col3 = st.columns([1.5, 1, 1.5])
         with col2:
             mode = st.radio("", ["Sign in", "Sign up"], horizontal=True, label_visibility="collapsed")
             email = st.text_input("Email", placeholder="you@example.com", label_visibility="collapsed")
             password = st.text_input("Password", type="password", placeholder="Password", label_visibility="collapsed")
             if mode == "Sign up":
+                st.caption("At least 6 characters, using both letters and numbers.")
                 confirm = st.text_input("Confirm password", type="password", placeholder="Confirm password", label_visibility="collapsed")
 
             if st.button(mode, use_container_width=True, type="primary"):
