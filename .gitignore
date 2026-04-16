@@ -1,0 +1,12 @@
+# Personal data — never push this
+habit_data.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Environment
+.env
+venv/
