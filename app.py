@@ -428,7 +428,7 @@ def page_today(data):
 
     habits = get_active_habits(data)
     if not habits:
-        st.info("You haven't added any habits yet — your streak starts the moment you do! 🚀")
+        st.info("No habits yet. Head to Habits to add your first one.")
         return
 
     logs_df = get_logs_df(data)
@@ -455,7 +455,7 @@ def page_today(data):
     <div style="background:#F0F0EE;border-radius:99px;height:8px;overflow:hidden;">
         <div style="background:{fill_color};height:100%;width:{pct}%;border-radius:99px;transition:width 0.4s ease;min-width:{'8px' if pct > 0 else '0'};"></div>
     </div>
-    {'<p style="font-size:13px;color:#16A34A;font-weight:500;margin:10px 0 0;">All done — great work today! 🎉</p>' if pct == 100 else ''}
+    {'<p style="font-size:13px;color:#16A34A;font-weight:500;margin:10px 0 0;">All done for today. Good work.</p>' if pct == 100 else ''}
 </div>
 """, unsafe_allow_html=True)
 
@@ -545,8 +545,8 @@ def page_manage(data):
     if active_habits:
         st.markdown("<h2 style='margin:24px 0 12px;'>Your Habits</h2>", unsafe_allow_html=True)
         for habit in active_habits:
-            init_tag = "  📖" if habit.get("has_initiation") else ""
-            with st.expander(f"{habit['name']}  —  {habit['target_days']}×/week{init_tag}"):
+            init_tag = "  (has initiation)" if habit.get("has_initiation") else ""
+            with st.expander(f"{habit['name']}  {habit['target_days']}x/week{init_tag}"):
                 with st.form(f"edit_{habit['id']}"):
                     new_name = st.text_input("Name", value=habit["name"])
                     new_target = st.slider("Days per week", 1, 7, habit["target_days"])
@@ -597,7 +597,7 @@ def page_manage(data):
                         save_data(data)
                         st.rerun()
     else:
-        st.info("No habits yet — add your first one above and let's get going! 🌱")
+        st.info("No habits yet. Add your first one above.")
 
     if archived_habits:
         with st.expander(f"Archived  ({len(archived_habits)})"):
@@ -620,7 +620,7 @@ def page_progress(data):
 
     habits = get_active_habits(data)
     if not habits:
-        st.info("Nothing to track yet — add your habits first and your progress chart will come alive! 📈")
+        st.info("Nothing to track yet. Add some habits first and your progress will show up here.")
         return
 
     logs_df = get_logs_df(data)
@@ -632,7 +632,7 @@ def page_progress(data):
     for i, habit in enumerate(habits):
         streak = calculate_streak(logs_df, habit["id"], today)
         with streak_cols[i]:
-            st.metric(habit["name"], f"🔥 {streak}" if streak >= 1 else "✨ Start today!")
+            st.metric(habit["name"], f"🔥 {streak}" if streak >= 1 else "Not started")
 
     st.divider()
 
@@ -734,7 +734,7 @@ def page_progress(data):
             c3.metric("On track", f"{pct}%",
                       delta="ahead" if pct >= 100 else "behind",
                       delta_color="normal" if pct >= 100 else "inverse")
-            c4.metric("Streak", f"🔥 {streak}" if streak else "—")
+            c4.metric("Streak", f"🔥 {streak}" if streak else "Not started")
             st.divider()
 
     with tab_edit:
@@ -774,7 +774,7 @@ def page_rewards(data):
     st.markdown("""<p style='color:#71717A;font-size:14px;margin-bottom:28px;'>
         Every habit you complete earns you symbolic money based on the rates you set.
         Add items to your wishlist, assign what % of your balance goes toward each one,
-        and watch your savings grow — as a mental reminder of the extras consistency can buy you.
+        and watch your savings grow as a mental reminder of the extras consistency can buy you.
     </p>""", unsafe_allow_html=True)
 
     logs_df = get_logs_df(data)
@@ -836,7 +836,7 @@ def page_rewards(data):
     if data["wishlist"]:
         total_allocated_pct = sum(float(i.get("allocation_pct", 0)) for i in data["wishlist"])
         if total_allocated_pct > 100:
-            st.warning(f"Your allocations add up to {total_allocated_pct:.0f}% — over 100%. Consider reducing some.")
+            st.warning(f"Your allocations add up to {total_allocated_pct:.0f}%, which is over 100%. Consider reducing some.")
 
         for item in data["wishlist"]:
             iid = item["id"]
@@ -879,7 +879,7 @@ def page_rewards(data):
                         save_data(data)
                         st.rerun()
     else:
-        st.markdown("<p style='color:#A1A1AA;font-size:13px;padding:12px 0;'>No items yet — add something you're saving up for.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color:#A1A1AA;font-size:13px;padding:12px 0;'>No items yet. Add something you are saving up for.</p>", unsafe_allow_html=True)
 
     # ── Earnings breakdown (collapsed) ──
     with st.expander("Earnings breakdown by habit"):
