@@ -18,17 +18,16 @@ st.set_page_config(
 )
 
 def auth_enabled():
-    """Returns True only if auth secrets are configured."""
+    """Returns True only if [auth] section exists in secrets."""
     try:
-        _ = st.user.is_logged_in
-        return True
+        return "auth" in st.secrets
     except Exception:
         return False
 
 def get_data_file():
     """Return a data file path scoped to the logged-in user."""
     try:
-        if st.user.is_logged_in:
+        if auth_enabled() and st.user.is_logged_in:
             user_hash = hashlib.md5(st.user.email.encode()).hexdigest()[:12]
             return os.path.join(os.path.dirname(__file__), f"habit_data_{user_hash}.json")
     except Exception:
