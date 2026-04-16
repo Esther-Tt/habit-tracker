@@ -1,12 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import json
-import os
 import uuid
 import re
-import hashlib
 from datetime import date, timedelta
+from supabase import create_client
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -17,13 +15,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-def auth_enabled():
-    try:
-        return bool(st.secrets.get("password"))
-    except Exception:
-        return False
-
-DATA_FILE = os.path.join(os.path.dirname(__file__), "habit_data.json")
+@st.cache_resource
+def get_supabase():
+    return create_client(st.secrets["supabase"]["url"], st.secrets["supabase"]["anon_key"])
 
 # ── CSS ─────────────────────────────────────────────────────────────────────────
 
@@ -273,14 +267,29 @@ hr { border-color: #ECECEA !important; margin: 20px 0 !important; }
 # ── Data helpers ───────────────────────────────────────────────────────────────
 
 def load_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
+    user_id = st.session_state.get("_user_id")
+    if not user_id:
+        return {"habits": [], "logs": []}
+    try:
+        sb = get_supabase()
+        sb.auth.set_session(st.session_state["_access_token"], st.session_state["_refresh_token"])
+        result = sb.table("user_data").select("data").eq("user_id", user_id).execute()
+        if result.data:
+            return result.data[0]["data"]
+    except Exception:
+        pass
     return {"habits": [], "logs": []}
 
 def save_data(data):
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=2, default=str)
+    user_id = st.session_state.get("_user_id")
+    if not user_id:
+        return
+    try:
+        sb = get_supabase()
+        sb.auth.set_session(st.session_state["_access_token"], st.session_state["_refresh_token"])
+        sb.table("user_data").upsert({"user_id": user_id, "data": data}).execute()
+    except Exception:
+        pass
 
 def get_active_habits(data):
     return [h for h in data["habits"] if h.get("active", True)]
@@ -904,24 +913,46 @@ def page_rewards(data):
 def main():
     inject_css()
 
-    if auth_enabled():
-        if not st.session_state.get("_authenticated"):
-            st.markdown("""
-<div style="text-align:center;padding:100px 20px 0;">
+    if not st.session_state.get("_user_id"):
+        st.markdown("""
+<div style="text-align:center;padding:80px 20px 0;">
     <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
-    <p style="font-size:15px;color:#71717A;margin-bottom:32px;">Enter your password to continue</p>
+    <p style="font-size:15px;color:#71717A;margin-bottom:28px;">Sign in or create an account</p>
 </div>
 """, unsafe_allow_html=True)
-            col1, col2, col3 = st.columns([2, 1, 2])
-            with col2:
-                pwd = st.text_input("Password", type="password", label_visibility="collapsed", placeholder="Password")
-                if st.button("Sign in", use_container_width=True):
-                    if pwd == st.secrets["password"]:
-                        st.session_state["_authenticated"] = True
+
+        col1, col2, col3 = st.columns([2, 1.2, 2])
+        with col2:
+            mode = st.radio("", ["Sign in", "Sign up"], horizontal=True, label_visibility="collapsed")
+            email = st.text_input("Email", placeholder="you@example.com", label_visibility="collapsed")
+            password = st.text_input("Password", type="password", placeholder="Password", label_visibility="collapsed")
+            if mode == "Sign up":
+                confirm = st.text_input("Confirm password", type="password", placeholder="Confirm password", label_visibility="collapsed")
+
+            if st.button(mode, use_container_width=True, type="primary"):
+                sb = get_supabase()
+                try:
+                    if mode == "Sign up":
+                        if password != confirm:
+                            st.error("Passwords do not match")
+                            st.stop()
+                        res = sb.auth.sign_up({"email": email, "password": password})
+                        if res.user and not res.session:
+                            st.info("Check your email to confirm your account, then sign in.")
+                            st.stop()
+                    else:
+                        res = sb.auth.sign_in_with_password({"email": email, "password": password})
+
+                    if res.session:
+                        st.session_state["_user_id"] = res.user.id
+                        st.session_state["_access_token"] = res.session.access_token
+                        st.session_state["_refresh_token"] = res.session.refresh_token
                         st.rerun()
                     else:
-                        st.error("Incorrect password")
-            st.stop()
+                        st.error("Sign in failed. Check your email and password.")
+                except Exception as e:
+                    st.error(str(e))
+        st.stop()
 
     data = load_data()
 
@@ -939,7 +970,10 @@ def main():
 </div>
 """, unsafe_allow_html=True)
     with col2:
-        pass
+        if st.button("Sign out", use_container_width=True):
+            for k in ["_user_id", "_access_token", "_refresh_token"]:
+                st.session_state.pop(k, None)
+            st.rerun()
 
     has_habits = bool(get_active_habits(data))
 
