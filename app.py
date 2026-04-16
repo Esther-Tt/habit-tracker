@@ -19,7 +19,7 @@ st.set_page_config(
 
 def auth_enabled():
     try:
-        return "auth" in st.secrets
+        return "google" in st.secrets.get("auth", {})
     except Exception:
         return False
 
@@ -920,7 +920,7 @@ def main():
 """, unsafe_allow_html=True)
             col1, col2, col3 = st.columns([2, 1, 2])
             with col2:
-                st.login()
+                st.login("google")
             st.stop()
 
     global DATA_FILE
