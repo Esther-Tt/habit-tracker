@@ -24,9 +24,16 @@ def auth_enabled():
         return False
 
 def get_data_file():
-    if auth_enabled() and st.user.is_logged_in:
-        email_hash = hashlib.md5(st.user.email.encode()).hexdigest()
-        return os.path.join(os.path.dirname(__file__), f"habit_data_{email_hash}.json")
+    if auth_enabled():
+        email = None
+        if st.user.is_logged_in:
+            email = st.user.email
+            st.session_state["_user_email"] = email
+        elif st.session_state.get("_user_email"):
+            email = st.session_state["_user_email"]
+        if email:
+            email_hash = hashlib.md5(email.encode()).hexdigest()
+            return os.path.join(os.path.dirname(__file__), f"habit_data_{email_hash}.json")
     return os.path.join(os.path.dirname(__file__), "habit_data.json")
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "habit_data.json")
@@ -911,7 +918,11 @@ def main():
     inject_css()
 
     if auth_enabled():
-        if not st.user.is_logged_in:
+        if st.user.is_logged_in:
+            # Cache email so reruns within this session stay logged in
+            st.session_state["_authenticated"] = True
+            st.session_state["_user_email"] = st.user.email
+        elif not st.session_state.get("_authenticated"):
             st.markdown("""
 <div style="text-align:center;padding:80px 20px;">
     <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
