@@ -19,22 +19,9 @@ st.set_page_config(
 
 def auth_enabled():
     try:
-        return "google" in st.secrets.get("auth", {})
+        return bool(st.secrets.get("password"))
     except Exception:
         return False
-
-def get_data_file():
-    if auth_enabled():
-        email = None
-        if st.user.is_logged_in:
-            email = st.user.email
-            st.session_state["_user_email"] = email
-        elif st.session_state.get("_user_email"):
-            email = st.session_state["_user_email"]
-        if email:
-            email_hash = hashlib.md5(email.encode()).hexdigest()
-            return os.path.join(os.path.dirname(__file__), f"habit_data_{email_hash}.json")
-    return os.path.join(os.path.dirname(__file__), "habit_data.json")
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "habit_data.json")
 
@@ -918,24 +905,23 @@ def main():
     inject_css()
 
     if auth_enabled():
-        if st.user.is_logged_in:
-            # Cache email so reruns within this session stay logged in
-            st.session_state["_authenticated"] = True
-            st.session_state["_user_email"] = st.user.email
-        elif not st.session_state.get("_authenticated"):
+        if not st.session_state.get("_authenticated"):
             st.markdown("""
-<div style="text-align:center;padding:80px 20px;">
+<div style="text-align:center;padding:100px 20px 0;">
     <p style="font-size:28px;font-weight:700;color:#18181B;letter-spacing:-0.5px;margin-bottom:8px;">✦ Habit Tracker</p>
-    <p style="font-size:15px;color:#71717A;margin-bottom:32px;">Sign in to access your habits</p>
+    <p style="font-size:15px;color:#71717A;margin-bottom:32px;">Enter your password to continue</p>
 </div>
 """, unsafe_allow_html=True)
             col1, col2, col3 = st.columns([2, 1, 2])
             with col2:
-                st.login("google")
+                pwd = st.text_input("Password", type="password", label_visibility="collapsed", placeholder="Password")
+                if st.button("Sign in", use_container_width=True):
+                    if pwd == st.secrets["password"]:
+                        st.session_state["_authenticated"] = True
+                        st.rerun()
+                    else:
+                        st.error("Incorrect password")
             st.stop()
-
-    global DATA_FILE
-    DATA_FILE = get_data_file()
 
     data = load_data()
 
@@ -953,8 +939,7 @@ def main():
 </div>
 """, unsafe_allow_html=True)
     with col2:
-        if auth_enabled():
-            st.logout()
+        pass
 
     has_habits = bool(get_active_habits(data))
 
