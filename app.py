@@ -428,7 +428,7 @@ def page_today(data):
 
     habits = get_active_habits(data)
     if not habits:
-        st.info("No habits yet — head to **Habits** to add some.")
+        st.info("You haven't added any habits yet — your streak starts the moment you do! 🚀")
         return
 
     logs_df = get_logs_df(data)
@@ -597,7 +597,7 @@ def page_manage(data):
                         save_data(data)
                         st.rerun()
     else:
-        st.info("No habits yet — add one above.")
+        st.info("No habits yet — add your first one above and let's get going! 🌱")
 
     if archived_habits:
         with st.expander(f"Archived  ({len(archived_habits)})"):
@@ -620,7 +620,7 @@ def page_progress(data):
 
     habits = get_active_habits(data)
     if not habits:
-        st.info("No habits yet — head to **Habits** to add some.")
+        st.info("Nothing to track yet — add your habits first and your progress chart will come alive! 📈")
         return
 
     logs_df = get_logs_df(data)
@@ -632,7 +632,7 @@ def page_progress(data):
     for i, habit in enumerate(habits):
         streak = calculate_streak(logs_df, habit["id"], today)
         with streak_cols[i]:
-            st.metric(habit["name"], f"🔥 {streak}" if streak >= 1 else "—")
+            st.metric(habit["name"], f"🔥 {streak}" if streak >= 1 else "✨ Start today!")
 
     st.divider()
 
@@ -912,18 +912,32 @@ def main():
 </div>
 """, unsafe_allow_html=True)
 
-    tab_today, tab_habits, tab_progress, tab_rewards = st.tabs([
-        "  Today  ", "  Habits  ", "  Progress  ", "  Rewards  "
-    ])
+    has_habits = bool(get_active_habits(data))
 
-    with tab_today:
-        page_today(data)
-    with tab_habits:
-        page_manage(data)
-    with tab_progress:
-        page_progress(data)
-    with tab_rewards:
-        page_rewards(data)
+    if has_habits:
+        tab_today, tab_habits, tab_progress, tab_rewards = st.tabs([
+            "  Today  ", "  Habits  ", "  Progress  ", "  Rewards  "
+        ])
+        with tab_today:
+            page_today(data)
+        with tab_habits:
+            page_manage(data)
+        with tab_progress:
+            page_progress(data)
+        with tab_rewards:
+            page_rewards(data)
+    else:
+        tab_habits, tab_today, tab_progress, tab_rewards = st.tabs([
+            "  Habits  ", "  Today  ", "  Progress  ", "  Rewards  "
+        ])
+        with tab_habits:
+            page_manage(data)
+        with tab_today:
+            page_today(data)
+        with tab_progress:
+            page_progress(data)
+        with tab_rewards:
+            page_rewards(data)
 
 if __name__ == "__main__":
     main()
