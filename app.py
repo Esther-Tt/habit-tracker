@@ -59,7 +59,7 @@ section[data-testid="stSidebar"] { display: none !important; }
     transition: all 0.15s ease;
 }
 .stTabs [aria-selected="true"] {
-    background: #2B5282 !important;
+    background: #18181B !important;
     color: #FFFFFF !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
@@ -109,13 +109,13 @@ section[data-testid="stSidebar"] { display: none !important; }
     border-color: #D4D4D8 !important;
 }
 .stButton > button[kind="primary"] {
-    background: #2B5282 !important;
+    background: #18181B !important;
     color: #FFFFFF !important;
-    border-color: #2B5282 !important;
+    border-color: #18181B !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #1E3A5F !important;
-    border-color: #1E3A5F !important;
+    background: #3F3F46 !important;
+    border-color: #3F3F46 !important;
 }
 
 /* ── Form submit button ── */
@@ -125,9 +125,9 @@ section[data-testid="stSidebar"] { display: none !important; }
     font-size: 13.5px !important;
 }
 [data-testid="stFormSubmitButton"] > button[kind="primary"] {
-    background: #2B5282 !important;
+    background: #18181B !important;
     color: white !important;
-    border-color: #2B5282 !important;
+    border-color: #18181B !important;
 }
 
 /* ── Inputs ── */
@@ -139,8 +139,8 @@ input[type="text"], input[type="number"], textarea {
     background: #FAFAF9 !important;
 }
 input[type="text"]:focus, textarea:focus {
-    border-color: #2B5282 !important;
-    box-shadow: 0 0 0 2px rgba(43,82,130,0.15) !important;
+    border-color: #18181B !important;
+    box-shadow: 0 0 0 2px rgba(24,24,27,0.08) !important;
 }
 
 /* ── Expanders ── */
@@ -163,24 +163,6 @@ input[type="text"]:focus, textarea:focus {
 }
 
 /* ── Checkboxes — large & circular ── */
-/* Override Streamlit's primary color (red/green) → navy */
-:root {
-    --primary-color: #2B5282 !important;
-    --st-color-primary: #2B5282 !important;
-}
-
-/* ── Titles and body text → navy ── */
-h1, h2, h3, h4, h5, h6,
-[data-testid="stMarkdownContainer"] h1,
-[data-testid="stMarkdownContainer"] h2,
-[data-testid="stMarkdownContainer"] h3 {
-    color: #2B5282 !important;
-}
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stText"] {
-    color: #2B5282 !important;
-}
-
 [data-testid="stCheckbox"] { padding: 2px 0 !important; }
 [data-testid="stCheckbox"] > label {
     align-items: center !important;
@@ -229,17 +211,17 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stProgressBar"] > div > div {
     height: 6px !important;
     border-radius: 99px !important;
-    background: #2B5282 !important;
+    background: #18181B !important;
 }
 
 /* ── Slider ── */
 [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-    background: #2B5282 !important;
+    background: #18181B !important;
 }
 
 /* ── Toggle ── */
 [data-testid="stToggle"] span[data-checked="true"] {
-    background: #2B5282 !important;
+    background: #18181B !important;
 }
 
 /* ── Dataframe ── */
@@ -263,24 +245,12 @@ hr { border-color: #ECECEA !important; margin: 20px 0 !important; }
 
 /* ── Progress bar ── */
 [data-testid="stProgressBar"] > div > div {
-    background: #2B5282 !important;
+    background: #18181B !important;
     border-radius: 99px !important;
 }
 [data-testid="stProgressBar"] > div {
     border-radius: 99px !important;
     background: #F0F0EE !important;
-}
-
-/* ── Sortable drag items ── */
-[data-testid="stCustomComponentV1"] div[style*="display: flex"] > div,
-.sortable-item, [class*="sortable"] > div {
-    background: #2B5282 !important;
-    color: #FFFFFF !important;
-    border-radius: 8px !important;
-    padding: 10px 16px !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    margin-bottom: 6px !important;
 }
 
 /* ── Page padding ── */
@@ -588,11 +558,7 @@ def page_manage(data):
     if active_habits:
         st.markdown("<h2 style='margin:24px 0 12px;'>Your Habits</h2>", unsafe_allow_html=True)
 
-        st.markdown("""
-<div style='background:#EBF0F8; border:1px solid #C3D3E8; border-radius:10px;
-     padding:10px 16px; margin-bottom:16px; font-size:13px; color:#2B5282;'>
-  ⠿ &nbsp;Drag the boxes below to reorder your habits.
-</div>""", unsafe_allow_html=True)
+        st.caption("Drag the boxes below to reorder your habits.")
 
         habit_names = [h["name"] for h in active_habits]
         sorted_names = sort_items(habit_names)
@@ -603,6 +569,7 @@ def page_manage(data):
             save_data(data)
             st.rerun()
 
+        st.caption("Edit habits")
         for habit in active_habits:
             init_tag = "  (has initiation)" if habit.get("has_initiation") else ""
             with st.expander(f"{habit['name']}  {habit['target_days']}x/week{init_tag}"):
