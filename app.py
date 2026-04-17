@@ -271,6 +271,18 @@ hr { border-color: #ECECEA !important; margin: 20px 0 !important; }
     background: #F0F0EE !important;
 }
 
+/* ── Sortable drag items ── */
+[data-testid="stCustomComponentV1"] div[style*="display: flex"] > div,
+.sortable-item, [class*="sortable"] > div {
+    background: #2B5282 !important;
+    color: #FFFFFF !important;
+    border-radius: 8px !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    margin-bottom: 6px !important;
+}
+
 /* ── Page padding ── */
 .block-container {
     padding-top: 24px !important;
@@ -583,13 +595,7 @@ def page_manage(data):
 </div>""", unsafe_allow_html=True)
 
         habit_names = [h["name"] for h in active_habits]
-        sorted_names = sort_items(
-            habit_names,
-            custom_style={"background": "#2B5282", "color": "#FFFFFF",
-                          "borderRadius": "8px", "padding": "10px 16px",
-                          "fontSize": "14px", "fontWeight": "500",
-                          "marginBottom": "6px"}
-        )
+        sorted_names = sort_items(habit_names)
         if sorted_names != habit_names:
             name_to_habit = {h["name"]: h for h in data["habits"]}
             inactive = [h for h in data["habits"] if not h.get("active", True)]
