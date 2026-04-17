@@ -59,7 +59,7 @@ section[data-testid="stSidebar"] { display: none !important; }
     transition: all 0.15s ease;
 }
 .stTabs [aria-selected="true"] {
-    background: #18181B !important;
+    background: #2B5282 !important;
     color: #FFFFFF !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
@@ -109,13 +109,13 @@ section[data-testid="stSidebar"] { display: none !important; }
     border-color: #D4D4D8 !important;
 }
 .stButton > button[kind="primary"] {
-    background: #18181B !important;
+    background: #2B5282 !important;
     color: #FFFFFF !important;
-    border-color: #18181B !important;
+    border-color: #2B5282 !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #3F3F46 !important;
-    border-color: #3F3F46 !important;
+    background: #1E3A5F !important;
+    border-color: #1E3A5F !important;
 }
 
 /* ── Form submit button ── */
@@ -125,9 +125,9 @@ section[data-testid="stSidebar"] { display: none !important; }
     font-size: 13.5px !important;
 }
 [data-testid="stFormSubmitButton"] > button[kind="primary"] {
-    background: #18181B !important;
+    background: #2B5282 !important;
     color: white !important;
-    border-color: #18181B !important;
+    border-color: #2B5282 !important;
 }
 
 /* ── Inputs ── */
@@ -139,8 +139,8 @@ input[type="text"], input[type="number"], textarea {
     background: #FAFAF9 !important;
 }
 input[type="text"]:focus, textarea:focus {
-    border-color: #18181B !important;
-    box-shadow: 0 0 0 2px rgba(24,24,27,0.08) !important;
+    border-color: #2B5282 !important;
+    box-shadow: 0 0 0 2px rgba(43,82,130,0.15) !important;
 }
 
 /* ── Expanders ── */
@@ -163,8 +163,11 @@ input[type="text"]:focus, textarea:focus {
 }
 
 /* ── Checkboxes — large & circular ── */
-/* Override Streamlit's primary color (red) → green for checkbox tick */
-:root { --primary-color: #16A34A !important; }
+/* Override Streamlit's primary color (red) → navy */
+:root {
+    --primary-color: #2B5282 !important;
+    --st-color-primary: #2B5282 !important;
+}
 
 [data-testid="stCheckbox"] { padding: 2px 0 !important; }
 [data-testid="stCheckbox"] > label {
@@ -214,17 +217,17 @@ input[type="text"]:focus, textarea:focus {
 [data-testid="stProgressBar"] > div > div {
     height: 6px !important;
     border-radius: 99px !important;
-    background: #18181B !important;
+    background: #2B5282 !important;
 }
 
 /* ── Slider ── */
 [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-    background: #18181B !important;
+    background: #2B5282 !important;
 }
 
 /* ── Toggle ── */
 [data-testid="stToggle"] span[data-checked="true"] {
-    background: #18181B !important;
+    background: #2B5282 !important;
 }
 
 /* ── Dataframe ── */
@@ -248,7 +251,7 @@ hr { border-color: #ECECEA !important; margin: 20px 0 !important; }
 
 /* ── Progress bar ── */
 [data-testid="stProgressBar"] > div > div {
-    background: #18181B !important;
+    background: #2B5282 !important;
     border-radius: 99px !important;
 }
 [data-testid="stProgressBar"] > div {
