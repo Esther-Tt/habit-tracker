@@ -5,6 +5,7 @@ import uuid
 import re
 from datetime import date, timedelta
 from supabase import create_client
+from streamlit_sortables import sort_items
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
@@ -559,6 +560,16 @@ def page_manage(data):
 
     if active_habits:
         st.markdown("<h2 style='margin:24px 0 12px;'>Your Habits</h2>", unsafe_allow_html=True)
+
+        habit_names = [h["name"] for h in active_habits]
+        sorted_names = sort_items(habit_names)
+        if sorted_names != habit_names:
+            name_to_habit = {h["name"]: h for h in data["habits"]}
+            inactive = [h for h in data["habits"] if not h.get("active", True)]
+            data["habits"] = [name_to_habit[n] for n in sorted_names] + inactive
+            save_data(data)
+            st.rerun()
+
         for habit in active_habits:
             init_tag = "  (has initiation)" if habit.get("has_initiation") else ""
             with st.expander(f"{habit['name']}  {habit['target_days']}x/week{init_tag}"):
