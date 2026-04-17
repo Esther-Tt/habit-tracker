@@ -561,8 +561,20 @@ def page_manage(data):
     if active_habits:
         st.markdown("<h2 style='margin:24px 0 12px;'>Your Habits</h2>", unsafe_allow_html=True)
 
+        st.markdown("""
+<div style='background:#EBF0F8; border:1px solid #C3D3E8; border-radius:10px;
+     padding:10px 16px; margin-bottom:16px; font-size:13px; color:#2B5282;'>
+  ⠿ &nbsp;Drag the boxes below to reorder your habits.
+</div>""", unsafe_allow_html=True)
+
         habit_names = [h["name"] for h in active_habits]
-        sorted_names = sort_items(habit_names)
+        sorted_names = sort_items(
+            habit_names,
+            custom_style={"background": "#2B5282", "color": "#FFFFFF",
+                          "border-radius": "8px", "padding": "10px 16px",
+                          "font-size": "14px", "font-weight": "500",
+                          "margin-bottom": "6px"}
+        )
         if sorted_names != habit_names:
             name_to_habit = {h["name"]: h for h in data["habits"]}
             inactive = [h for h in data["habits"] if not h.get("active", True)]
