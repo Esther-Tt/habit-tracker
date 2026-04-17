@@ -163,10 +163,22 @@ input[type="text"]:focus, textarea:focus {
 }
 
 /* ── Checkboxes — large & circular ── */
-/* Override Streamlit's primary color (red) → navy */
+/* Override Streamlit's primary color (red/green) → navy */
 :root {
     --primary-color: #2B5282 !important;
     --st-color-primary: #2B5282 !important;
+}
+
+/* ── Titles and body text → navy ── */
+h1, h2, h3, h4, h5, h6,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3 {
+    color: #2B5282 !important;
+}
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stText"] {
+    color: #2B5282 !important;
 }
 
 [data-testid="stCheckbox"] { padding: 2px 0 !important; }
@@ -574,9 +586,9 @@ def page_manage(data):
         sorted_names = sort_items(
             habit_names,
             custom_style={"background": "#2B5282", "color": "#FFFFFF",
-                          "border-radius": "8px", "padding": "10px 16px",
-                          "font-size": "14px", "font-weight": "500",
-                          "margin-bottom": "6px"}
+                          "borderRadius": "8px", "padding": "10px 16px",
+                          "fontSize": "14px", "fontWeight": "500",
+                          "marginBottom": "6px"}
         )
         if sorted_names != habit_names:
             name_to_habit = {h["name"]: h for h in data["habits"]}
